@@ -36,10 +36,45 @@ var Data = {};
 
   }
 
+  var post = function(url, body, headers) {
+    console.log("posting:", body)
+    return fetch(url, {
+      credentials: 'same-origin',
+      method: 'POST',
+      headers: headers || {},
+      body: body
+    })
+  }
+
+  var postJSON = function(url, obj) {
+    return post(url, JSON.stringify(obj), {
+      'Content-Type': 'application/json'
+    })
+  }
+
   Data.currentUser = function() {
     var altcloudCookie = Cookies.get('_acu')
     var username = altcloudCookie && JSON.parse(altcloudCookie).username
     return username
+  }
+
+  Data.upload = function(blob) {
+    var createdAt = new Date()
+    var basename = createdAt.toISOString().replace(/[T:.]/g,'-')
+    var imageName = basename+'.jpg'
+    var currentUser = Data.currentUser()
+    return post('/data/images/'+currentUser+'/'+imageName, blob, { 'Content-Type':'image/jpeg' })
+      .then(function(res) {
+        console.log("posted image, response:", res)
+        if (res.status === 201) {
+          return postJSON('/data/photos/'+currentUser+'/'+basename+'.json', {
+            created: createdAt.toISOString(),
+            image: imageName
+          })
+        } else {
+          throw new Error("Response was " + res.status)
+        }
+      })
   }
 
   Data.follow = function(username, follow) {
@@ -51,14 +86,7 @@ var Data = {};
         } else {
           newFollowList = currentFollowList.filter(function(u) { return u !== username })
         }
-        return fetch('/data/follows/'+Data.currentUser()+'/follows.json', {
-          credentials: 'same-origin',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(newFollowList)
-        })
+        return postJSON('/data/follows/'+Data.currentUser()+'/follows.json', newFollowList)
       })
   }
 

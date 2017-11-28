@@ -7,11 +7,18 @@ data/profiles.json:
 data/photos/:user:
   collection: true
 
-data/profiles/:user:
+data/photos/:user/*splat:
+  write: $user
+  delete: $user
+
+data/images/:user/*splat:
+  write: $user
+  delete: $user
+
+data/profiles/:user.json:
   write: $user
   delete: $user
 
 data/follows/:user/follows.json:
   write: $user
   delete: $user
-  

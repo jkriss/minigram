@@ -1,0 +1,42 @@
+---
+layout: layout.html
+---
+
+<h1>Upload</h1>
+
+<div id="preview"></div>
+
+<input type="file" id="file-input">
+<button id="save-button" style="display:none">Save</button>
+
+<script src="/scripts/load-image.all.min.js" charset="utf-8"></script>
+<script>
+document.getElementById('file-input').onchange = function (e) {
+  var saveButton = document.getElementById('save-button')
+  var uploadInput = document.getElementById('file-input')
+
+  loadImage(
+      e.target.files[0],
+      function (img) {
+        console.log("loaded image:", img)
+        document.getElementById('preview').appendChild(img);
+        uploadInput.style.display = 'none'
+        saveButton.style.display = 'block'
+        saveButton.onclick = function() {
+          img.toBlob(function(b) {
+            Data.upload(b).then(function() {
+              console.log("done?")
+              window.location = '/'
+            })
+          }, 'image/jpeg')
+        }
+      },
+      {
+        maxWidth: 1200,
+        maxHeight: 1200,
+        cover: true,
+        orientation: true
+      } // Options
+  );
+};
+</script>

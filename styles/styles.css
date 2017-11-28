@@ -9,7 +9,6 @@ nav {
   padding: 0 2rem;
 }
 
-
 .navigation .links {
   list-style: none;
 }
@@ -26,4 +25,8 @@ nav {
 
 ul.follows, ul.follows li {
   display: inline-block;
+}
+
+#preview canvas {
+  max-width: 100%;
 }
