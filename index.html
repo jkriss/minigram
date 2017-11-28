@@ -12,6 +12,9 @@ layout: layout.html
         <img src="/data/images/{{username}}/{{image}}" style="width: 200px; height: 200px;"/>
       </a>
     {{/feed}}
+    {{#emptyFeed}}
+      <p>Maybe <a href="/people">follow some people</a>?</p>
+    {{/emptyFeed}}
   {{/currentUser}}
   {{^currentUser}}
     <h1>Minigram</h1>
@@ -24,9 +27,9 @@ layout: layout.html
   var currentUser = Data.currentUser()
   if (currentUser) {
     // load feed for person
-    Data.user(currentUser, { follows: true })
+    Data.user(currentUser, { follows: true, createProfile: true })
       .then(function(person) {
-        var follows = [currentUser].concat(person.follows)
+        var follows = person ? [currentUser].concat(person.follows) : [currentUser]
         return Promise.all(follows.map(function(p) {
           return Data.user(p, { photos: true })
         }))
@@ -34,6 +37,7 @@ layout: layout.html
             // flatten this into a photo list, with usernames and timestamps
             var feed = []
             peopleWithPhotos.forEach(function(p) {
+              if (!p) return
               p.photos.forEach(function(photo) {
                 var created = new Date(photo.created)
                 feed.push({
@@ -45,7 +49,11 @@ layout: layout.html
               })
             })
             feed = feed.sort(function(a,b) { return a.created < b.created })
-            document.getElementById('index').innerHTML = template.render({ currentUser: currentUser, feed: feed })
+            document.getElementById('index').innerHTML = template.render({
+              currentUser: currentUser,
+              feed: feed,
+              emptyFeed: feed.length === 0
+            })
           })
       })
   } else {

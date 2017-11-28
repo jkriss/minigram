@@ -66,6 +66,13 @@ var Data = {};
     })
   }
 
+  var createProfile = function(username) {
+    return postJSON('/data/profiles/'+username+'.json', {
+      username: username,
+      joined: new Date().toISOString()
+    })
+  }
+
   Data.currentUser = function() {
     var altcloudCookie = Cookies.get('_acu')
     var username = altcloudCookie && JSON.parse(altcloudCookie).username
@@ -124,6 +131,7 @@ var Data = {};
     return profile(username)
       .then(function(person) {
         var fetches = []
+        if (opts.createProfile) fetches.push(createProfile(username))
         if (opts.follows) fetches.push(follows(username, person))
         if (opts.photos) fetches.push(photos(username, person))
         return Promise.all(fetches)

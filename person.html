@@ -10,7 +10,12 @@ layout: layout.html
 
 <script type="text/template" id="person-template">
   <h1>{{username}}</h1>
+  {{#joined}}
   <p>joined {{ joined }}</p>
+  {{/joined}}
+  {{^joined}}
+    <p>Nobody with this username has joined yet.</p>
+  {{/joined}}
   {{#follows}}
   <div>
     Follows
@@ -57,18 +62,27 @@ layout: layout.html
 
     Data.user(username, {follows: true, photos: true})
       .then(function(person) {
-        person.joined = fecha.format(person.joined, 'mediumDate')
-        document.getElementById('person').innerHTML = template.render(person)
-        document.getElementById('photos').innerHTML = photosTemplate.render(person)
+        if (person) {
+          person.joined = fecha.format(person.joined, 'mediumDate')
+          document.getElementById('person').innerHTML = template.render(person)
+          document.getElementById('photos').innerHTML = photosTemplate.render(person)
+
+          // get follow data
+          var currentUser = Data.currentUser()
+          if (currentUser && currentUser != username) {
+            Data.user(currentUser, { follows: true })
+              .then(function(user) {
+                if (user) {
+                  document.getElementById('follow-toggle').innerHTML = followTemplate.render({ following: user.follows.includes(username) })
+                }
+              })
+          }
+
+        } else {
+          document.getElementById('person').innerHTML = template.render({ username: username})
+        }
       })
 
-    var currentUser = Data.currentUser()
-    if (currentUser && currentUser != username) {
-      Data.user(currentUser, { follows: true })
-        .then(function(user) {
-          document.getElementById('follow-toggle').innerHTML = followTemplate.render({ following: user.follows.includes(username) })
-        })
-    }
   }
 
   showPerson(username)
