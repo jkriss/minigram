@@ -14,9 +14,14 @@ nav {
   list-style: none;
 }
 
-.navigation .links, .navigation .links  li {
+.navigation .links, .navigation .links  li, .navigation ul.actions, .navigation ul.actions  li {
   display: inline-block;
   margin-bottom: 0;
+}
+
+.navigation .actions {
+  float: right;
+  text-transform: lowercase;
 }
 
 ul.follows, ul.follows li {

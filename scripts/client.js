@@ -36,6 +36,32 @@ var Data = {};
 
   }
 
+  Data.currentUser = function() {
+    var altcloudCookie = Cookies.get('_acu')
+    var username = altcloudCookie && JSON.parse(altcloudCookie).username
+    return username
+  }
+
+  Data.follow = function(username, follow) {
+    return follows(Data.currentUser())
+      .then(function(currentFollowList) {
+        var newFollowList = []
+        if (follow) {
+          newFollowList = currentFollowList.concat(username)
+        } else {
+          newFollowList = currentFollowList.filter(function(u) { return u !== username })
+        }
+        return fetch('/data/follows/'+Data.currentUser()+'/follows.json', {
+          credentials: 'same-origin',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(newFollowList)
+        })
+      })
+  }
+
   Data.user = function(username, opts) {
     if (!opts) opts = {}
     return profile(username)

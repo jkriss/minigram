@@ -10,3 +10,8 @@ data/photos/:user:
 data/profiles/:user:
   write: $user
   delete: $user
+
+data/follows/:user/follows.json:
+  write: $user
+  delete: $user
+  

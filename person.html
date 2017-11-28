@@ -2,11 +2,11 @@
 layout: layout.html
 ---
 
-<div id="person">
-</div>
+<div id="person"></div>
 
-<div id="photos">
-</div>
+<span id="follow-toggle"></span>
+
+<div id="photos"></div>
 
 <script type="text/template" id="person-template">
   <h1>{{username}}</h1>
@@ -29,11 +29,29 @@ layout: layout.html
   {{/photos}}
 </script>
 
+<script type="text/template" id="follow-template">
+  {{#following}}
+    <a href="#" class="button" onclick="follow(false)">unfollow</a>
+  {{/following}}
+  {{^following}}
+    <a href="#" class="button"  onclick="follow(true)">follow</a>
+  {{/following}}
+</script>
+
 <script>
+
+  var username = window.location.pathname.split('/').pop()
+
+  var follow = function(followOrUnfollow) {
+    Data.follow(username, followOrUnfollow).then(function() {
+      window.location.reload()
+    })
+  }
 
   var showPerson = function(username) {
     var template = Hogan.compile(document.getElementById('person-template').innerText)
     var photosTemplate = Hogan.compile(document.getElementById('photos-template').innerText)
+    var followTemplate = Hogan.compile(document.getElementById('follow-template').innerText)
 
     Data.user(username, {follows: true, photos: true})
       .then(function(person) {
@@ -41,8 +59,16 @@ layout: layout.html
         document.getElementById('person').innerHTML = template.render(person)
         document.getElementById('photos').innerHTML = photosTemplate.render(person)
       })
+
+    var currentUser = Data.currentUser()
+    if (currentUser && currentUser != username) {
+      Data.user(currentUser, { follows: true })
+        .then(function(user) {
+          document.getElementById('follow-toggle').innerHTML = followTemplate.render({ following: user.follows.includes(username) })
+        })
+    }
   }
 
-  showPerson(window.location.pathname.split('/').pop())
+  showPerson(username)
 
 </script>

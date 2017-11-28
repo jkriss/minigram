@@ -2,4 +2,42 @@
 layout: layout.html
 ---
 
-<h1>yo.</h1>
+<div id="index"></div>
+
+<script type="text/template" id="template">
+  {{#currentUser}}
+    <h1>Sup, {{currentUser}}</h1>
+    {{#feed}}
+      {{#photos}}
+        <a href="/people/{{username}}">
+          <img src="/data/images/{{username}}/{{image}}" style="width: 200px; height: 200px;"/>
+        </a>
+      {{/photos}}
+    {{/feed}}
+  {{/currentUser}}
+  {{^currentUser}}
+    <h1>Minigram</h1>
+    Maybe you want to <a href="/login">log in</a>?
+  {{/currentUser}}
+</script>
+
+<script>
+  var template = Hogan.compile(document.getElementById('template').innerText)
+  var currentUser = Data.currentUser()
+  if (currentUser) {
+    // load feed for person
+    Data.user(currentUser, { follows: true })
+      .then(function(person) {
+        var follows = [currentUser].concat(person.follows)
+        return Promise.all(follows.map(function(p) {
+          return Data.user(p, { photos: true })
+        }))
+          .then(function(peopleWithPhotos) {
+            // flatten this into a photo list, with usernames and timestamps
+            document.getElementById('index').innerHTML = template.render({ currentUser: currentUser, feed: peopleWithPhotos })
+          })
+      })
+  } else {
+    document.getElementById('index').innerHTML = template.render()
+  }
+</script>
