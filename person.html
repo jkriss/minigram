@@ -35,31 +35,12 @@ layout: layout.html
     var template = Hogan.compile(document.getElementById('person-template').innerText)
     var photosTemplate = Hogan.compile(document.getElementById('photos-template').innerText)
 
-    // render profile stuff
-    fetch('/data/profiles/'+username+'.json')
-      .then(function(res) { return res.json() })
+    Data.user(username, {follows: true, photos: true})
       .then(function(person) {
-        fetch('/data/follows/'+username+'/follows.json')
-          .then(function(res) { return res.status === 200 ? res.json() : null })
-          .then(function(follows) {
-            person.follows = follows || []
-            person.joined = fecha.format(new Date(person.joined), 'mediumDate')
-            document.getElementById('person').innerHTML = template.render(person)
-          })
+        person.joined = fecha.format(person.joined, 'mediumDate')
+        document.getElementById('person').innerHTML = template.render(person)
+        document.getElementById('photos').innerHTML = photosTemplate.render(person)
       })
-      .catch(function(err) { handleError(err, "Error loading person") })
-
-    // render person's photos
-    fetch('/data/photos/'+username+'.json')
-      .then(function(res) {
-        return res.status === 200 ? res.json() : null
-      })
-      .then(function(json) {
-        if (!json) return
-        var photos = Object.values(json)
-        document.getElementById('photos').innerHTML = photosTemplate.render({ photos: photos, username: username })
-      })
-      .catch(function(err) { handleError(err, "Error loading photos") })
   }
 
   showPerson(window.location.pathname.split('/').pop())
