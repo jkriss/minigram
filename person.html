@@ -25,7 +25,9 @@ layout: layout.html
 
 <script type="text/template" id="photos-template">
   {{#photos}}
-  <img src="/data/images/{{username}}/{{image}}" style="width: 200px; height: 200px;"/>
+  <a href="/photos/{{username}}/{{image}}">
+    <img src="/data/images/{{username}}/{{image}}" style="width: 200px; height: 200px;"/>
+  </a>
   {{/photos}}
 </script>
 

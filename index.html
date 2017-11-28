@@ -8,11 +8,9 @@ layout: layout.html
   {{#currentUser}}
     <h1>Sup, {{currentUser}}</h1>
     {{#feed}}
-      {{#photos}}
-        <a href="/people/{{username}}">
-          <img src="/data/images/{{username}}/{{image}}" style="width: 200px; height: 200px;"/>
-        </a>
-      {{/photos}}
+      <a href="/photos/{{username}}/{{image}}" title="{{username}} {{createdFormatted}}">
+        <img src="/data/images/{{username}}/{{image}}" style="width: 200px; height: 200px;"/>
+      </a>
     {{/feed}}
   {{/currentUser}}
   {{^currentUser}}
@@ -34,7 +32,20 @@ layout: layout.html
         }))
           .then(function(peopleWithPhotos) {
             // flatten this into a photo list, with usernames and timestamps
-            document.getElementById('index').innerHTML = template.render({ currentUser: currentUser, feed: peopleWithPhotos })
+            var feed = []
+            peopleWithPhotos.forEach(function(p) {
+              p.photos.forEach(function(photo) {
+                var created = new Date(photo.created)
+                feed.push({
+                  username: p.username,
+                  image: photo.image,
+                  created: created,
+                  createdFormatted: fecha.format(created, 'mediumDate')
+                })
+              })
+            })
+            feed = feed.sort(function(a,b) { return a.created < b.created })
+            document.getElementById('index').innerHTML = template.render({ currentUser: currentUser, feed: feed })
           })
       })
   } else {

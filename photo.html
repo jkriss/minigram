@@ -1,0 +1,24 @@
+---
+layout: layout.html
+---
+
+<div id="photo"></div>
+
+<script type="text/template" id="photo-template">
+  <h2><a href="/people/{{username}}">{{username}}</a></h2>
+  <h3>{{photo.createdFormatted}}</h3>
+  <img src="/data/images/{{username}}/{{image}}"/>
+</script>
+
+
+<script>
+  var urlParts = window.location.pathname.split('/')
+  var image = urlParts.pop()
+  var username = urlParts.pop()
+  var template = Hogan.compile(document.getElementById('photo-template').innerText)
+  Data.photo(username, image)
+    .then(function(photo) {
+      photo.createdFormatted = fecha.format(photo.created, 'MMM D, YYYY h:mm a')
+      document.getElementById('photo').innerHTML = template.render({username: username, image: image, photo: photo})
+    })
+</script>

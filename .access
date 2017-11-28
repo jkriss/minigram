@@ -1,6 +1,9 @@
 people/*splat:
   rewrite: /person
 
+photos/*splat:
+  rewrite: /photo
+
 data/profiles.json:
   collection: true
 

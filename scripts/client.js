@@ -33,7 +33,11 @@ var Data = {};
         if (person) person.photos = photos
         return photos
       })
+  }
 
+  var photo = function(username, image) {
+    return fetch('/data/photos/'+username+'/'+image.replace(/\.\w+$/,'.json'))
+      .then(function(res) { return res.status === 200 ? res.json() : null })
   }
 
   var post = function(url, body, headers) {
@@ -87,6 +91,14 @@ var Data = {};
           newFollowList = currentFollowList.filter(function(u) { return u !== username })
         }
         return postJSON('/data/follows/'+Data.currentUser()+'/follows.json', newFollowList)
+      })
+  }
+
+  Data.photo = function(username, image) {
+    return photo(username, image)
+      .then(function(photo) {
+        photo.created = new Date(photo.created)
+        return photo
       })
   }
 
