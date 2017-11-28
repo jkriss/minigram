@@ -1,0 +1,12 @@
+people/*splat:
+  rewrite: /people
+
+data/profiles.json:
+  collection: true
+
+data/photos/:user:
+  collection: true
+
+data/profiles/:user:
+  write: $user
+  delete: $user

@@ -1,0 +1,24 @@
+nav {
+  background: #fafafa;
+  padding: 1rem;
+}
+
+.container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+
+.navigation .links {
+  list-style: none;
+}
+
+.navigation .links, .navigation .links  li {
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+ul.follows, ul.follows li {
+  display: inline-block;
+}
