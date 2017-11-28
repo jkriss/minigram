@@ -7,6 +7,9 @@ layout: layout.html
 <script type="text/template" id="photo-template">
   <h2><a href="/people/{{username}}">{{username}}</a></h2>
   <h3>{{photo.createdFormatted}}</h3>
+  {{#ownPhoto}}
+  <a class="button" onclick="del()">delete</a>
+  {{/ownPhoto}}
   <img src="/data/images/{{username}}/{{image}}"/>
 </script>
 
@@ -15,10 +18,27 @@ layout: layout.html
   var urlParts = window.location.pathname.split('/')
   var image = urlParts.pop()
   var username = urlParts.pop()
+  var currentUser = Data.currentUser()
   var template = Hogan.compile(document.getElementById('photo-template').innerText)
+
+  var del = function() {
+    if (confirm("Are you sure you want to delete this photo?")) {
+      Data.deletePhoto(username, image)
+        .then(function() {
+          window.location = '/people/'+username
+        })
+    }
+  }
+
   Data.photo(username, image)
     .then(function(photo) {
       photo.createdFormatted = fecha.format(photo.created, 'MMM D, YYYY h:mm a')
-      document.getElementById('photo').innerHTML = template.render({username: username, image: image, photo: photo})
+      var data = {
+        username: username,
+        ownPhoto: username === currentUser,
+        image: image,
+        photo: photo
+      }
+      document.getElementById('photo').innerHTML = template.render(data)
     })
 </script>

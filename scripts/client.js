@@ -35,13 +35,16 @@ var Data = {};
       })
   }
 
+  var jsonSuffix = function(s) {
+    return s.replace(/\.\w+$/,'.json')
+  }
+
   var photo = function(username, image) {
-    return fetch('/data/photos/'+username+'/'+image.replace(/\.\w+$/,'.json'))
+    return fetch('/data/photos/'+username+'/'+jsonSuffix(image))
       .then(function(res) { return res.status === 200 ? res.json() : null })
   }
 
   var post = function(url, body, headers) {
-    console.log("posting:", body)
     return fetch(url, {
       credentials: 'same-origin',
       method: 'POST',
@@ -56,10 +59,24 @@ var Data = {};
     })
   }
 
+  var del = function(url) {
+    return fetch(url, {
+      credentials: 'same-origin',
+      method: 'DELETE'
+    })
+  }
+
   Data.currentUser = function() {
     var altcloudCookie = Cookies.get('_acu')
     var username = altcloudCookie && JSON.parse(altcloudCookie).username
     return username
+  }
+
+  Data.deletePhoto = function(username, image) {
+    return del('/data/images/'+username+'/'+image)
+      .then(function() {
+        return del('/data/photos/'+username+'/'+jsonSuffix(image))
+      })
   }
 
   Data.upload = function(blob) {
