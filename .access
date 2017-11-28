@@ -1,5 +1,5 @@
 people/*splat:
-  rewrite: /people
+  rewrite: /person
 
 data/profiles.json:
   collection: true
