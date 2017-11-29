@@ -1,0 +1,20 @@
+---
+layout: layout.html
+---
+
+<h1>Settings for <span id="current-user-settings"></span></h1>
+
+<a class="button" onclick="deleteAccount()">Delete account</a>
+
+<script>
+  document.getElementById('current-user-settings').innerText = Data.currentUser()
+  var deleteAccount = function() {
+    if (confirm("Are you sure you want to delete your account? It can't be recovered.")) {
+      console.log("ok, here we go...")
+      Data.deleteAccount().then(function() {
+        console.log("done, logging out")
+        window.location = '/logout'
+      }).catch(console.error)
+    }
+  }
+</script>

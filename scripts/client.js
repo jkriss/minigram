@@ -24,8 +24,10 @@ var Data = {};
   }
 
   var photos = function(username, person) {
+    console.log("getting photos for", username)
     return fetch('/data/photos/'+username+'.json')
       .then(function(res) {
+        console.log("photos response:", res)
         return res.status === 200 ? res.json() : null
       })
       .then(function(json) {
@@ -41,7 +43,7 @@ var Data = {};
 
   var photo = function(username, image) {
     return fetch('/data/photos/'+username+'/'+jsonSuffix(image))
-      .then(function(res) { return res.status === 200 ? res.json() : null })
+      .then(function(res) { return res.status === 200 ? res.json() : [] })
   }
 
   var post = function(url, body, headers) {
@@ -83,6 +85,25 @@ var Data = {};
     return del('/data/images/'+username+'/'+image)
       .then(function() {
         return del('/data/photos/'+username+'/'+jsonSuffix(image))
+      })
+  }
+
+  Data.deleteAccount = function() {
+    var username = Data.currentUser()
+    return photos(username)
+      .then(function(photos) {
+        var fetches = []
+        // delete all photos and metadata
+        photos.forEach(function(p) {
+          fetches.push(Data.deletePhoto(username, p.image))
+        })
+        // delete the follow list
+        fetches.push(del('/data/follows/'+username+'/follows.json'))
+        // now delete the profile
+        fetches.push(del('/data/profiles/'+username+'.json'))
+        return Promise.all(fetches).then(function() {
+          console.log("deleted everything")
+        })
       })
   }
 

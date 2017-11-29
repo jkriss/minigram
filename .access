@@ -1,3 +1,6 @@
+settings:
+  read: authenticated
+
 people/*splat:
   rewrite: /person
 
